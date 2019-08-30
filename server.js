@@ -5,8 +5,10 @@ const bodyParser = require('body-parser');
 const app = express();
 const cors = require('cors');
 
-const accountSid = 'ACca79709f89410213ccd8280824a7ea56';
-const authToken = '0130034496bfb1389dd5cde1c7983ade';
+const SECRETS = require('./secrets');
+
+const accountSid = SECRETS.TWILIO_ACCOUNT_SID;
+const authToken = SECRETS.TWILIO_AUTH_TOKEN;
 const client = require('twilio')(accountSid, authToken);
 
 app.use(cors());
@@ -15,7 +17,7 @@ app.use(bodyParser({ extended: true }));
 
 let db;
 
-MongoClient.connect('mongodb://uofthacks:uofthacks6@ds018258.mlab.com:18258/uofthacks',
+MongoClient.connect(SECRETS.MONGO_CONNECTION_STRING,
   { useNewUrlParser: true }, (err, client) => {
     if (err) console.log(err);
     db = client.db('uofthacks');
@@ -62,8 +64,8 @@ app.post('/addition', (req, res) => {
       client.messages
         .create({
           body: `You have a new Textbookify match for your ${arr[0].course_code} textbook!`,
-          from: '+15874172430',
-          to: '+14166299630',
+          from: SECRETS.TWILIO_FROM_NUMBER,
+          to: SECRETS.TWILIO_TO_NUMBER,
         })
         .then(message => console.log(message.sid))
         .done();
